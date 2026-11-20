@@ -68,7 +68,7 @@ An Arduino Uno or an equivalent ATmega328P board can be used, but the firmware p
 ### Connection Diagram
 
 ```text
-+-----------------------------+
+                      +-----------------------------+
                       |                             |
                       |         ATmega328P          |
                       |                             |
