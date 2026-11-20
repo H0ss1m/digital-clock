@@ -69,27 +69,27 @@ An Arduino Uno or an equivalent ATmega328P board can be used, but the firmware p
 
 ```text
 +-----------------------------+
-|                             |
-|         ATmega328P          |
-|                             |
-|                    PC0 (A0) |-------> [ RS ] LCD 16x2
-|                    PC1 (A1) |-------> [ E  ] LCD 16x2
-[GND] ---[ Mode ]----| PD2     PC2 (A2) |-------> [ D4 ] LCD 16x2
-[GND] ---[  Up  ]----| PD3     PC3 (A3) |-------> [ D5 ] LCD 16x2
-[GND] ---[ Down ]----| PD4     PC4 (A4) |-------> [ D6 ] LCD 16x2
-[GND] ---[  Ack ]----| PD5     PC5 (A5) |-------> [ D7 ] LCD 16x2
-|                             |
-|                             |
-[GND] --[- BUZ +]----| PB0     |
-|                             |
-+-----------------------------+
+                      |                             |
+                      |         ATmega328P          |
+                      |                             |
+                      |                    PC0 (A0) |-------> [ RS ] LCD 16x2
+                      |                    PC1 (A1) |-------> [ E  ] LCD 16x2
+ [GND] ---[ Mode ]----| PD2                PC2 (A2) |-------> [ D4 ] LCD 16x2
+ [GND] ---[  Up  ]----| PD3                PC3 (A3) |-------> [ D5 ] LCD 16x2
+ [GND] ---[ Down ]----| PD4                PC4 (A4) |-------> [ D6 ] LCD 16x2
+ [GND] ---[  Ack ]----| PD5                PC5 (A5) |-------> [ D7 ] LCD 16x2
+                      |                             |
+                      |                             |
+ [GND] --[- BUZ +]----| PB0                         |
+                      |                             |
+                      +-----------------------------+
 
 -------------------------------------------------------------------------------
-LCD power and control pins:
-[ VDD ] ---------------------> Vdd (5 V)
-[ VSS ] ---------------------> Ground (GND)
-[ VEE ] (Contrast) ----------> Ground (GND)
-[ RW  ] (Read/Write) --------> Ground (GND)
+* LCD power and control pins:
+  [ VDD ] ---------------------> Vdd (5V)
+  [ VSS ] ---------------------> Ground (GND)
+  [ VEE ] (Contrast) ----------> Ground (GND)
+  [ RW  ] (Read/Write) --------> Ground (GND)
 ```
 
 The button wiring assumes that each button connects the indicated pin directly to GND. The ATmega328P internal pull-ups keep the pins HIGH when the buttons are released.
