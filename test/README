@@ -1,5 +1,7 @@
 
-This directory is intended for PlatformIO Test Runner and project tests.
+This directory is reserved for PlatformIO Test Runner tests.
+
+The repository currently has no automated test implementation. Use the manual verification sequence in the project [README](../README.md).
 
 Unit Testing is a software testing method by which individual units of
 source code, sets of one or more MCU program modules together with associated

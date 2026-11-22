@@ -1,5 +1,15 @@
 
-This directory is intended for project header files.
+This directory contains project header files.
+
+Header files declare public constants, types, and function prototypes. They also document module pin mappings and hardware configuration.
+
+## File Guide
+
+| Directory | Files | Functionality |
+|---|---|---|
+| `APP/` | `clock_app.h` | Public clock application initialization and loop APIs |
+| `HAL/` | `lcd.h`, `pushbuttons.h`, `buzzer.h` | LCD, pushbutton, and buzzer APIs and pin mappings |
+| `MCAL/` | `gpio.h`, `timer0.h`, `timer1.h`, `pcint.h` | ATmega328P GPIO, timer, and pin-change interrupt APIs |
 
 A header file is a file containing C declarations and macro definitions
 to be shared between several project source files. You request the use of a

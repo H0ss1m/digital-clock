@@ -1,6 +1,7 @@
 
-This directory is intended for project specific (private) libraries.
-PlatformIO will compile them to static libraries and link into the executable file.
+This directory is reserved for project-specific PlatformIO libraries.
+
+The current digital-clock firmware does not use a library under `lib/`. APP, HAL, and MCAL code is compiled directly from `src/` and `include/`.
 
 The source code of each library should be placed in a separate directory
 ("lib/your_library_name/[Code]").

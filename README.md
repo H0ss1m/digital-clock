@@ -1,55 +1,64 @@
 # ATmega328P Digital Clock
 
-A 24-hour digital clock and alarm written in C for the ATmega328P microcontroller. The project uses PlatformIO and is organized as a layered embedded application:
+A PlatformIO firmware project that implements a 12-hour/24-hour digital clock and alarm on an ATmega328P. The firmware is organized into application, hardware abstraction, and microcontroller abstraction layers.
 
-- Application logic for the clock, alarm, menus, and button actions
-- Hardware Abstraction Layer (HAL) drivers for buttons, LCD, and buzzer
-- Microcontroller Abstraction Layer (MCAL) drivers for GPIO, Timer1, and Pin Change Interrupt 2
+The application is built around:
 
-The clock displays the current time and configured alarm on a 16x2 character LCD. Four push buttons control the mode and setting menus, and a buzzer signals a matching alarm time.
+- Timer1 for a 1-second clock tick
+- Timer0 for the buzzer toggle interval
+- A 16x2 HD44780-compatible LCD
+- Four active-low pushbuttons
+- A buzzer output
 
 ## Features
 
-- 24-hour time keeping (`00:00:00` to `23:59:59`)
-- Initial time: `12:00:00`
-- Initial alarm: `12:01`
-- Time-based rollover across seconds, minutes, hours, and midnight
-- Adjustable clock hours and minutes
-- Adjustable alarm hours and minutes
-- Alarm that activates when hours and minutes match
-- ACK button to silence a ringing alarm
-- ACK button in normal mode to reset the seconds to zero
-- Interrupt-based, non-blocking button detection
+- 24-hour internal time storage (`00:00:00` through `23:59:59`)
+- Selectable 12-hour or 24-hour LCD output
+- Initial time of `12:00:00`
+- Initial alarm of `12:01:00`
+- Second, minute, hour, and midnight rollover
+- Editable clock and alarm hours, minutes, and seconds
+- 12-hour AM/PM editing
+- An intermittent hardware-timed alarm buzzer
+- UP/DOWN alarm silence while ringing
+- SET-menu navigation with a blinking underline cursor
+- A two-second alarm-time preview
 - 16x2 LCD output in 4-bit data mode
-- Modular source structure based on APP, HAL, and MCAL layers
+- Modular APP, HAL, and MCAL source organization
 
 ## Display
 
 ### Normal mode
 
 ```text
-Time: 12:34:56
-Alrm: 12:35
+Keep Going Grp 6
+Time:12:34:56 pm
 ```
 
-The second row changes while the alarm is active:
+The first row remains unchanged in normal mode. ACK switches the time between 12-hour and 24-hour formats.
+
+### Alarm preview
+
+UP or DOWN in normal mode displays the configured alarm for two seconds:
 
 ```text
-ALARM RINGING!
+Alarm Time:
+ 12:35:00 pm
 ```
 
 ### Setting modes
 
-Use the MODE button to move through these screens:
+SET steps through the clock fields and alarm fields:
 
 ```text
-Set Clock Hours
-Set Clock Mins
-Set Alarm Hours
-Set Alarm Mins
+Set time:
+12:34:56 pm
+
+Set alarm:
+12:35:00 pm
 ```
 
-An arrow (`->`) is shown before the currently selected value.
+SET advances from hours to minutes to seconds and, in 12-hour mode, AM/PM. A blinking underline identifies the active field.
 
 ## Required Hardware
 
@@ -117,12 +126,12 @@ The LCD interface uses 4-bit mode. LCD pins D0 through D3 are not used and do no
 
 The buttons connect between ground and their PORTD pin. Internal pull-ups are enabled in firmware.
 
-| Button | ATmega328P pin | Arduino Uno pin | MODE transition |
+| Button | ATmega328P pin | Arduino Uno pin | Function |
 |---|---:|---:|---|
-| MODE | PD2 | D2 | Moves Normal -> Clock Hours -> Clock Minutes -> Alarm Hours -> Alarm Minutes -> Normal |
-| UP | PD3 | D3 | Increases the value in a setting mode |
-| DOWN | PD4 | D4 | Decreases the value in a setting mode |
-| ACK | PD5 | D5 | Silences the alarm or resets seconds in Normal mode |
+| SET | PD2 | D2 | Enters settings and advances the active clock/alarm field |
+| UP | PD3 | D3 | Increases a setting or opens the alarm-time preview |
+| DOWN | PD4 | D4 | Decreases a setting or opens the alarm-time preview |
+| ACK | PD5 | D5 | Switches the display between 12-hour and 24-hour formats |
 
 For each button:
 
@@ -151,32 +160,28 @@ Do not add an external pull-up in addition to the internal pull-up. An external 
 
 ## Operation
 
-1. Apply power. The clock starts at `12:00:00` and the alarm starts at `12:01`.
+1. Apply power. The clock starts at `12:00:00`, the alarm starts at `12:01:00`, and the display uses 12-hour format.
 2. Read the time and alarm on the LCD.
-3. Press **MODE** repeatedly to enter and exit each setting screen.
-4. In a setting screen, press **UP** or **DOWN** to change the displayed value.
-5. Press **MODE** until the normal clock screen appears.
-6. In normal mode, press **ACK** to reset seconds to zero.
-7. When the time reaches the configured alarm time, the buzzer turns on and `ALARM RINGING!` appears.
-8. Press **ACK** while ringing to turn off the buzzer and leave normal operation.
+3. Press **ACK** to toggle 12-hour/24-hour display format.
+4. Press **UP** or **DOWN** in normal mode to preview the alarm time.
+5. Press **SET** to enter clock setting. SET advances through hours, minutes, seconds, and AM/PM.
+6. In a setting screen, press **UP** or **DOWN** to change the active field.
+7. Press **SET** repeatedly until the normal clock screen appears.
+8. When the time reaches the configured alarm, the buzzer toggles intermittently.
+9. Press **UP** or **DOWN** while ringing to silence the alarm.
 
 ### Alarm Timing
 
-The alarm activates only when all of these conditions are true:
+The alarm activates when the current hour, minute, and second match the configured alarm. The check runs on each Timer1 1-second callback.
 
-- The clock is in normal mode
-- Hours match
-- Minutes match
-- Seconds are zero
-
-After the alarm is acknowledged, the current firmware allows it to remain silent until the next matching hour and minute occurrence. A test at a time of `12:01:00` will ring for the next matching minute boundary unless seconds or mode state change.
+Pressing UP or DOWN stops an active ring and consumes that button press. The clock can ring again when the alarm state is matched by a later timer tick.
 
 ### State and Reset Behavior
 
-Clock time, alarm time, and setting modes are stored in RAM. They are **not** saved to EEPROM or nonvolatile flash storage. Rebooting or disconnecting power resets:
+Clock time, alarm time, display format, and setting modes are stored in RAM. They are **not** saved to EEPROM or nonvolatile flash storage. Rebooting or disconnecting power resets:
 
 - Clock time to `12:00:00`
-- Alarm time to `12:01`
+- Alarm time to `12:01:00`
 - Current mode to normal mode
 - Alarm state to off
 
@@ -240,51 +245,54 @@ digital clock/
 |-- platformio.ini
 |-- src/
 |   |-- main.c
-|   |-- APP/
-|   |   |-- clock_app.c
-|   |-- HAL/
-|   |   |-- button.c
-|   |   |-- buzzer.c
-|   |   |-- lcd.c
-|   |-- MCAL/
-|       |-- gpio.c
-|       |-- pcint.c
-|       |-- timer1.c
+|   |-- APP/clock_app.c
+|   |-- HAL/buzzer.c
+|   |-- HAL/lcd.c
+|   |-- HAL/pushbuttons.c
+|   `-- MCAL/gpio.c
+|       MCAL/pcint.c
+|       MCAL/timer0.c
+|       MCAL/timer1.c
 |-- include/
-|   |-- APP/
-|   |-- HAL/
-|   |-- MCAL/
+|   |-- APP/clock_app.h
+|   |-- HAL/buzzer.h
+|   |-- HAL/lcd.h
+|   |-- HAL/pushbuttons.h
+|   `-- MCAL/gpio.h
+|       MCAL/pcint.h
+|       MCAL/timer0.h
+|       MCAL/timer1.h
 |-- lib/
 |-- test/
-|-- .pio/
+`-- .pio/
 ```
 
 ### Source Responsibilities
 
 | Module | Responsibility |
 |---|---|
-| `main.c` | Initializes the clock application and enters the main update loop |
+| `main.c` | Initializes the clock application and enters the infinite application loop |
 | `clock_app.c` | Keeps time, manages modes and alarm state, handles button actions, and updates the LCD |
-| `button.c` | Configures button pins and forwards falling-edge button events to the application |
+| `pushbuttons.c` | Configures PD2-PD5 and reads their active-low states |
 | `lcd.c` | Controls the HD44780-compatible LCD in 4-bit mode |
-| `buzzer.c` | Turns the buzzer output on or off |
-| `gpio.c` | Provides direction, output, input, and pull-up GPIO operations |
-| `timer1.c` | Configures ATmega328P Timer1 for a one-second callback |
-| `pcint.c` | Configures Pin Change Interrupt 2 for PD2-PD5 |
+| `buzzer.c` | Produces an intermittent buzzer signal with a 250 ms toggle interval |
+| `gpio.c` | Provides GPIO direction, output, input, and pull-up operations |
+| `timer0.c` | Generates 1 ms interrupts for buzzer timing |
+| `timer1.c` | Generates 1-second interrupts for clock updates |
+| `pcint.c` | Provides a pin-change-interrupt callback helper for PORTD |
 
 ## Firmware Design
 
 ### Main Loop
 
-`main()` calls `ClockApp_Init()` once and then calls `ClockApp_Update()` repeatedly.
+`main()` calls `ClockApp_Init()` once and then calls `ClockApp_Start()`. `ClockApp_Start()` runs forever and performs:
 
-The update loop:
-
-1. Clears the LCD when a mode transition occurs
-2. Checks for the alarm match
-3. Controls the buzzer
-4. Writes the appropriate normal or setting text to the LCD
-5. Waits 50 ms
+1. Falling-edge button polling
+2. Alarm suppression and format/mode handling
+3. Clock and alarm field adjustment
+4. Alarm-preview timeout handling
+5. LCD rendering and underline-cursor blinking
+6. A 20 ms loop delay
 
 ### Timer1
 
@@ -296,21 +304,21 @@ Timer1 runs in CTC mode with a 256 prescaler and compare value `62499`. With a 1
 
 Each interrupt increments the clock's seconds. The callback updates minute, hour, and midnight rollover values.
 
-### Button Interrupts
+### Button Handling
 
-Buttons on PORTD (PD2-PD5) use the PCINT2 pin-change interrupt. On each interrupt, the firmware compares the previous and current pin values and detects the falling edge for an assumed active-low button.
+The application polls the active-low buttons every 20 ms and detects a rising edge of the logical button state (`PB_NOT_PRESSED` to `PB_PRESSED`). Internal pull-ups keep released pins HIGH.
 
-The callback masks the pressed pins and invokes the application button handler immediately.
+The MCAL `pcint.c` module provides pin-change-interrupt support, but the current application does not register or use it. It reads the four button GPIO pins directly through the HAL.
 
 ## Customization
 
 ### Change Pin Assignments
 
-Update the pin definitions in the relevant HAL files:
+Update the pin definitions in the relevant HAL headers:
 
-- `include/HAL/button.h` for button pins
-- `src/HAL/lcd.c` for LCD pins
-- `src/HAL/buzzer.c` for the buzzer pin
+- `include/HAL/pushbuttons.h` for button pins
+- `include/HAL/lcd.h` for LCD pins
+- `include/HAL/buzzer.h` for the buzzer pin
 
 Changing pins may require the corresponding MCAL/interrupt configuration to be updated.
 
@@ -319,20 +327,20 @@ Changing pins may require the corresponding MCAL/interrupt configuration to be u
 The initial clock state is declared in `src/APP/clock_app.c`:
 
 ```c
-static volatile uint8_t sec = 0, min = 0, hr = 12;
+cur_hour = 12U;
+cur_min = 0U;
+cur_sec = 0U;
 ```
-
-Change `hr`, `min`, or `sec` to the desired power-on value.
 
 ### Change the Default Alarm
 
 The initial alarm state is declared in `src/APP/clock_app.c`:
 
 ```c
-static volatile uint8_t alarm_hr = 12, alarm_min = 1;
+alm_hour = 12U;
+alm_min = 1U;
+alm_sec = 0U;
 ```
-
-Change `alarm_hr` and `alarm_min` to the desired power-on alarm.
 
 ### Change the Clock Frequency
 
@@ -356,9 +364,9 @@ Recommended manual test sequence:
 4. Wait across a 60-second boundary and confirm minute rollover.
 5. Set the clock to `23:59`, wait for midnight, and confirm it becomes `00:00`.
 6. Set an alarm to the next minute.
-7. Confirm the buzzer and `ALARM RINGING!` screen activate at seconds zero.
-8. Press ACK and confirm the buzzer turns off.
-9. Press ACK in normal mode and confirm seconds reset to zero.
+7. Confirm the buzzer toggles at the alarm time.
+8. Press UP or DOWN and confirm the buzzer stops.
+9. Press ACK and confirm the display switches from 12-hour to 24-hour format and back.
 10. Test all UP/DOWN wraparound behavior at `23/00` and `59/00`.
 
 ## Troubleshooting
@@ -375,15 +383,15 @@ Recommended manual test sequence:
 ### Buttons Do Nothing
 
 - Verify each button connects its MCU pin to ground when pressed
-- Confirm MODE, UP, DOWN, and ACK are on PD2-PD5
+- Confirm SET, UP, DOWN, and ACK are on PD2-PD5
 - Confirm all button pins are unpowered and floating internally only when the button is released
 - Check for solder joints or loose jumper wires
 
 ### Buzzer Stays On
 
-- Press ACK
+- Press UP or DOWN
 - Check PB0 wiring
-- Verify `Buzzer_On()` and `Buzzer_Off()` behavior
+- Verify `Buzzer_StartBeep()` and `Buzzer_StopBeep()` behavior
 - Confirm that the alarm time has not matched again due to the minute/hour rollover
 
 ### Clock Runs at the Wrong Speed
