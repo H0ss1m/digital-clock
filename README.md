@@ -2,6 +2,8 @@
 
 A PlatformIO firmware project that implements a 12-hour/24-hour digital clock and alarm on an ATmega328P. The firmware is organized into application, hardware abstraction, and microcontroller abstraction layers.
 
+> Firmware status: functional ATmega328P clock/alarm firmware with no persistent storage and no automated test suite.
+
 The application is built around:
 
 - Timer1 for a 1-second clock tick

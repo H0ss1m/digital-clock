@@ -17,6 +17,8 @@ This file contains the main digital-clock application.
 - Stops the buzzer when UP or DOWN is pressed while ringing
 - Updates the LCD after state or time changes
 
+Timer1 pauses clock progression while the clock is in set-time mode. Alarm setting remains independent of the running clock.
+
 ### Public API
 
 The implementation exposes `ClockApp_Init()` and `ClockApp_Start()` through `include/APP/clock_app.h`.

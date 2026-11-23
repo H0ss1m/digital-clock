@@ -1,13 +1,5 @@
+# Tests
 
 This directory is reserved for PlatformIO Test Runner tests.
 
-The repository currently has no automated test implementation. Use the manual verification sequence in the project [README](../README.md).
-
-Unit Testing is a software testing method by which individual units of
-source code, sets of one or more MCU program modules together with associated
-control data, usage procedures, and operating procedures, are tested to
-determine whether they are fit for use. Unit testing finds problems early
-in the development cycle.
-
-More information about PlatformIO Unit Testing:
-- https://docs.platformio.org/en/latest/advanced/unit-testing/index.html
+The repository currently has no automated test implementation. Use the manual verification sequence in the project README (the parent directory) to cover build, upload, rollover, alarm behavior, 12/24-hour switching, and LCD/button operation.

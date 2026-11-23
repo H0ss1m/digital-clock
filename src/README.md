@@ -21,3 +21,5 @@ The firmware source is divided into three layers:
 | `MCAL/timer0.c` | Provides a 1 ms callback interrupt for buzzer timing |
 | `MCAL/timer1.c` | Provides a 1-second callback interrupt for clock timing |
 | `MCAL/pcint.c` | Supplies reusable PORTD pin-change interrupt setup and callback dispatch |
+
+`main.c` initializes the clock, starts Timer1, and enters the application's never-returning loop.

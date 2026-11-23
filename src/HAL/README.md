@@ -9,3 +9,5 @@ The HAL provides feature-level operations so application code does not manipulat
 | `buzzer.c` | Initializes PB0 and uses Timer0 to toggle the alarm output every 250 ms |
 
 Corresponding public declarations and pin mappings are located in the matching files under `include/HAL/`.
+
+All HAL modules rely on MCAL GPIO and timer drivers; application code does not access AVR I/O registers directly.

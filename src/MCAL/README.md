@@ -10,3 +10,5 @@ The MCAL contains the direct ATmega328P hardware drivers.
 | `pcint.c` | Enables pin-change interrupts for a PORTD pin mask and dispatches falling-edge callback masks |
 
 All register access in this layer uses AVR I/O definitions and interrupt vectors. Higher-level application and HAL code should call these APIs rather than editing registers directly.
+
+Timer0 supplies the buzzer's 1 ms callback. Timer1 supplies the 1000 ms callback used for clock updates.

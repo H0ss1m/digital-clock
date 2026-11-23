@@ -6,3 +6,5 @@
 | `timer0.h` | Declares APIs to start and stop the 1 ms CTC timer callback |
 | `timer1.h` | Declares the API to initialize the 1-second CTC timer callback |
 | `pcint.h` | Declares pin-change interrupt setup and callback registration APIs |
+
+Normal application code should use the HAL for GPIO and peripheral operations rather than editing AVR I/O registers directly.
