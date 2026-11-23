@@ -305,8 +305,8 @@ void ClockApp_Init(void)
     PB_Init();
     Buzzer_Init();
 
-    /* Pass callback directly during Timer1 initialization */
-    Timer1_Init_1Sec(ClockApp_Tick1Sec);
+    /* Pass required time (1000 ms) and callback to generic Timer1_Init */
+    Timer1_Init(1000U, ClockApp_Tick1Sec);
     display_dirty = 1U;
 }
 

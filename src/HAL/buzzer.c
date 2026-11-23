@@ -41,7 +41,7 @@ void Buzzer_StartBeep(void)
     tone_ms_counter = 0U;
     current_state   = BUZZER_ON;
     GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, (uint8_t)BUZZER_ON);
-    Timer0_Start_1ms(Buzzer_TimerTick);
+    Timer0_Init(1U, Buzzer_TimerTick); /* Pass 1ms base tick to generic Timer0_Init */
 }
 
 void Buzzer_StopBeep(void)

@@ -1,30 +1,32 @@
 /**
  * @file    timer0.h
  * @author  Group 6
- * @date    2026-11-22
- * @brief   Timer0 driver header file for ATmega328P.
+ * @date    2026-11-23
+ * @brief   Generic Timer0 driver header file for ATmega328P.
  *
- * Provides 1ms periodic interrupt functionality using Timer0 in CTC mode,
- * dedicated to non-blocking peripheral timing such as buzzer ringing.
+ * Provides periodic hardware timer interrupts using Timer0 in CTC mode.
+ * The compare match register (OCR0A) is calculated dynamically from the
+ * requested period in milliseconds.
  */
 
 #ifndef TIMER0_H
 #define TIMER0_H
 
+#include <stdint.h>
+
 /**
- * @brief Start Timer0 in CTC mode to generate a 1ms periodic interrupt.
+ * @brief Initialize and start Timer0 in CTC mode for a given period in ms.
  *
- * Configures Timer0 with a prescaler of 64 and OCR0A = 249 (for 16 MHz F_CPU),
- * registers the provided callback, and enables global interrupts.
+ * Automatically selects an appropriate prescaler and computes OCR0A using:
+ * OCR0A = ((F_CPU / 1000) * time_ms / Prescaler) - 1.
  *
- * @param callback Pointer to the function invoked every 1ms inside the ISR.
+ * @param time_ms  Desired interrupt period in milliseconds (1 to 16 ms at 16 MHz).
+ * @param callback Pointer to the function invoked on each compare match interrupt.
  */
-void Timer0_Start_1ms(void (*callback)(void));
+void Timer0_Init(uint16_t time_ms, void (*callback)(void));
 
 /**
  * @brief Stop Timer0 and disable its compare match interrupt.
- *
- * Clears the clock select bits and disables OCIE0A.
  */
 void Timer0_Stop(void);
 
